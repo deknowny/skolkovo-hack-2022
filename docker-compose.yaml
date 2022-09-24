@@ -1,4 +1,15 @@
 version: '3'
 
 services:
-  
+  interface:
+    build: ./interface
+    container_name: interface
+    command: next start
+
+    volumes:
+      - ./interface/pages:/app/pages
+      - ./interface/components:/app/components
+      - ./interface/public:/app/public
+
+    ports:
+      - '8001:8001'

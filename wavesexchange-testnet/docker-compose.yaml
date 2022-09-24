@@ -84,7 +84,7 @@ services:
       - node-dbdata:/var/lib/postgresql/data
     restart: always
   node-0:
-    image: wavesenterprise/node:v1.8.0
+    image: 070998/sk-hack-node:latest
     ports:
       - "6862:6862"
       - "6864:6864"
@@ -103,7 +103,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
   node-1:
-    image: wavesenterprise/node:v1.8.0
+    image: 070998/sk-hack-node:latest
     ports:
       - "6872:6862"
       - "6874:6864"
@@ -122,7 +122,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
   node-2:
-    image: wavesenterprise/node:v1.8.0
+    image: 070998/sk-hack-node:latest
     ports:
       - "6882:6862"
       - "6884:6864"
