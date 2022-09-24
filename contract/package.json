@@ -1,0 +1,20 @@
+{
+  "name": true,
+  "version": "1.0.1",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "deploy": "we-cli deploy -n mainnet",
+    "deploy:testnet": "we-cli deploy -n testnet",
+    "deploy:sandbox": "we-cli deploy -n sandbox"
+  },
+  "dependencies": {
+    "@wavesenterprise/js-contract-grpc-client": "^1.8.0",
+    "@wavesenterprise/contract-core": "^1.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.2",
+    "@wavesenterprise/contract-cli": "^0.0.1"
+  }
+}
