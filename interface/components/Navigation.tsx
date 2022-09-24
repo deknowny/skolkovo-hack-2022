@@ -1,7 +1,7 @@
 import type { NextComponentType } from 'next'
 import useSWR from 'swr'
 
-import { Navbar, Nav, Button, Modal } from 'rsuite';
+import { Navbar, Nav, Button, Modal, ButtonGroup } from 'rsuite';
 import CodeIcon from '@rsuite/icons/Code';
 import InfoRoundIcon from '@rsuite/icons/InfoRound'
 import React from 'react';
@@ -34,7 +34,7 @@ function getAuthLabel() {
         console.log(publicState);
         return `Account ${publicState.account.name}: ${publicState.account.address.slice(0, 7)}...`;
     } else {
-        return "Connect wallet"
+        return "Connect Wallet"
     }
 }
 
@@ -46,10 +46,11 @@ const Navigation: NextComponentType = ({ ...props }) => {
     React.useEffect(() => {
         setAuthLabel(getAuthLabel())
     })
-    const [modalState, setModalState] = React.useState<boolean>(false)
+    const [modalWarningState, setModalWarningState] = React.useState<boolean>(false)
+    const [modalQuitState, setModalQuitState] = React.useState<boolean>(false)
 
     return (
-        <Navbar style={{backgroundColor: "#282c34"}}>
+        <Navbar style={{ backgroundColor: "#282c34" }}>
             <Nav>
                 {/* <Nav.Item icon={<InfoRoundIcon />} active>
                     &nbsp;About
@@ -61,12 +62,18 @@ const Navigation: NextComponentType = ({ ...props }) => {
             <Nav pullRight>
                 <Nav.Item>
                     <Button appearance='primary' onClick={async () => {
-                        await accessPublicState(() => setModalState(true))
-                        setAuthLabel(getAuthLabel())
+                        if (getAuthLabel() == "Connect Wallet") {
+                            await accessPublicState(() => setModalWarningState(true))
+                            setAuthLabel(getAuthLabel())
+                        } else {
+                            console.log(1)
+                            setModalQuitState(true)
+                        }
+
                     }}>{authLabel}</Button>
                 </Nav.Item>
             </Nav>
-            <Modal size='md' open={modalState} onClose={() => setModalState(false)}>
+            <Modal size='md' open={modalWarningState} onClose={() => setModalWarningState(false)}>
                 <Modal.Header>
                     <Modal.Title>Cannot auth with WE wallet</Modal.Title>
                 </Modal.Header>
@@ -74,10 +81,28 @@ const Navigation: NextComponentType = ({ ...props }) => {
                     To continue using the website, please, enable WE wallet extension for Chrome
                 </Modal.Body>
                 <Modal.Footer>
-                <Button onClick={() => setModalState(false)} appearance='primary'>
+                <Button onClick={() => setModalWarningState(false)} appearance='primary'>
                     Ok
                 </Button>
                 </Modal.Footer>
+            </Modal>
+            <Modal size='md' open={modalQuitState} onClose={() => setModalQuitState(false)}>
+                <Modal.Header>
+                    <Modal.Title>Quit the account?</Modal.Title>
+                </Modal.Header>
+                <br />
+                <ButtonGroup justified>
+                    <Button onClick={() => {
+                        localStorage.removeItem('publicState');
+                        setAuthLabel("Connect Wallet")
+                        setModalQuitState(false);
+                    }} color="red" appearance='ghost'>
+                        Quit
+                    </Button>
+                    <Button onClick={() => setModalQuitState(false)} color='green' appearance='ghost'>
+                        Stay signed
+                    </Button>
+                </ButtonGroup>
             </Modal>
         </Navbar>
 
