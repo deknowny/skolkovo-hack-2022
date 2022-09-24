@@ -52,9 +52,6 @@ const Navigation: NextComponentType = ({ ...props }) => {
     return (
         <Navbar style={{ backgroundColor: "#282c34" }}>
             <Nav>
-                {/* <Nav.Item icon={<InfoRoundIcon />} active>
-                    &nbsp;About
-                </Nav.Item> */}
                 <Nav.Item icon={<CodeIcon />} active>
                     &nbsp;Source code
                 </Nav.Item>
@@ -62,11 +59,10 @@ const Navigation: NextComponentType = ({ ...props }) => {
             <Nav pullRight>
                 <Nav.Item>
                     <Button appearance='primary' onClick={async () => {
-                        if (getAuthLabel() == "Connect Wallet") {
+                        if (authLabel == "Connect Wallet") {
                             await accessPublicState(() => setModalWarningState(true))
                             setAuthLabel(getAuthLabel())
                         } else {
-                            console.log(1)
                             setModalQuitState(true)
                         }
 
@@ -92,15 +88,15 @@ const Navigation: NextComponentType = ({ ...props }) => {
                 </Modal.Header>
                 <br />
                 <ButtonGroup justified>
+                    <Button onClick={() => setModalQuitState(false)} color='green' appearance='ghost'>
+                        Stay signed
+                    </Button>
                     <Button onClick={() => {
                         localStorage.removeItem('publicState');
                         setAuthLabel("Connect Wallet")
                         setModalQuitState(false);
                     }} color="red" appearance='ghost'>
                         Quit
-                    </Button>
-                    <Button onClick={() => setModalQuitState(false)} color='green' appearance='ghost'>
-                        Stay signed
                     </Button>
                 </ButtonGroup>
             </Modal>
