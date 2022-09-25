@@ -1,4 +1,5 @@
 import {Action, Asset, Context, ContractState, Ctx, Param, Payments, State} from "@wavesenterprise/contract-core";
+import {Long} from "@wavesenterprise/transactions-factory";
 
 export interface BankToken {
     AssetID: string;
@@ -94,10 +95,28 @@ export default class SyndexContract {
 
     @Action()
     async DepositCollateral(payments: Payments) {
-
-        //TODO checking
-        const assetWest = payments[0];
-        const assetEast = payments[1];
+        let assetWest, assetEast
+        if (payments.length == 2) {
+            if (!payments[0].assetId) {
+                assetWest = payments[0];
+                assetEast = payments[1];
+            } else {
+                assetWest = payments[1];
+                assetEast = payments[0];
+            }
+        } else {
+            if (payments[0].assetId) {
+                assetWest = payments[0]
+                assetEast = {
+                    amount: payments[0].amount.sub(payments[0].amount)
+                }
+            } else {
+                assetEast = payments[0]
+                assetWest = {
+                    amount: payments[0].amount.sub(payments[0].amount)
+                }
+            }
+        }
 
         if (!assetWest && !assetEast) {
             throw new Error('One asset required!');
@@ -169,7 +188,7 @@ export default class SyndexContract {
                 assetId: assetId,
                 nonce: 1
             });
-            new Asset(assetId).transfer(this.context.sender, amount);
+            new Asset(assetId).transfer(this.context.tx.sender, amount);
             bank.TokenList.push({
                 Price: 1,
                 AssetID: assetId,
@@ -186,7 +205,7 @@ export default class SyndexContract {
                 quantity: amount,
                 isReissuable: true
             })
-            new Asset(susdAddress).transfer(this.context.sender, amount);
+            new Asset(susdAddress).transfer(this.context.tx.sender, amount);
             for (const i in bank.TokenList) {
                 if (bank.TokenList[i].AssetID == susdAddress) {
                     bank.TokenList[i].Supply += amount.valueOf();
