@@ -9,9 +9,11 @@ import React from 'react';
 
 
 async function accessPublicState(openAlert: Function) {
+     // @ts-ignore
     if (!window.WEWallet) {
         openAlert()
     } else {
+         // @ts-ignore
         const WEWallet = window.WEWallet
         const getPublicState = async () => {
             try {

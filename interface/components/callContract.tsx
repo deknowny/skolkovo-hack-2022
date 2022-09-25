@@ -6,7 +6,6 @@ import getConfig from "next/config";
 
 
 const config = getConfig();
-const eastAssetId = config.publicRuntimeConfig.eastAssetId;
 const contractId = config.publicRuntimeConfig.contractId;
 const contractVersion = config.publicRuntimeConfig.contractVersion;
 const nodeURL = config.publicRuntimeConfig.nodeURL;

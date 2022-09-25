@@ -17,6 +17,7 @@ const TXStalker = ({prepareParamsCb, preparePaymentsCb, ...props}: {
     const [txStepStatus, setTxStepStatus] = React.useState<"process" | "finish" | "wait" | "error">("process");
     const [txId, setTxId] = React.useState<string>("")
     const [callFailMsg, setCallFailMsg] = React.useState<string>("")
+    const [broadcastFailMsg, setBroadcastFailMsg] = React.useState<string>("")
 
     return (
         <div>
@@ -30,8 +31,13 @@ const TXStalker = ({prepareParamsCb, preparePaymentsCb, ...props}: {
                         prepareParamsCb(),
                         preparePaymentsCb(),
                         (res) => {
-                            setTxStep(2)
                             res.json().then((parsed) => {
+                                if ('error' in parsed) {
+                                    setBroadcastFailMsg(parsed['message'])
+                                    setTxStepStatus("error")
+                                    return
+                                }
+                                setTxStep(2)
                                 let refreshId = setInterval(() => {
                                     let localTxId = parsed['id']
                                     fetch(
@@ -66,7 +72,10 @@ const TXStalker = ({prepareParamsCb, preparePaymentsCb, ...props}: {
                             })
 
                         },
-                        (err) => setTxStepStatus("error"),
+                        (err) => {
+                            setTxStepStatus("error"),
+                            console.log(err)
+                        },
                         (res) => {
                             setTxStep(1)
                             setTxId(res["id"])
@@ -82,7 +91,7 @@ const TXStalker = ({prepareParamsCb, preparePaymentsCb, ...props}: {
             <Panel style={{display: txPanelOpened}} header={<Loader style={{display: txStepStatus == "process" ? "block" : "none"}} size="md" speed="fast" content={<h3>&nbsp;Processing the TX</h3>} />} shaded bordered>
                 <Steps current={txStep} vertical currentStatus={txStepStatus}>
                     <Steps.Item title={<span>Sign Transation { txId }</span>} />
-                    <Steps.Item title="Broadcast Transaction" />
+                    <Steps.Item title={<span>Broadcast Transaction{ broadcastFailMsg ? `: An error occured '${broadcastFailMsg}'` : '' }</span>} />
                     <Steps.Item title={<span>Executing call{ callFailMsg ? `: Reverted with '${callFailMsg}'` : '' }</span>} />
                 </Steps>
             </Panel>

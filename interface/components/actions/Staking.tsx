@@ -9,7 +9,7 @@ import getPublicState from '@/components/getPublicState'
 import getWeWallet from '../getWeWallet';
 import { TRANSACTION_VERSIONS } from '@wavesenterprise/js-sdk';
 import callContract from '@/components/callContract';
-import TXStalker from '../txStalker';
+import TXStalker from '@/components/TXStalker';
 
 
 const config = getConfig();
@@ -41,7 +41,13 @@ const StakeDrawer = ({opened, setOpened, ...props}: {
                             step={100}
                             defaultValue={westAmount}
                             value={westAmount}
-                            onChange={setWestAmount}
+                            onChange={(val: string | number, _) => {
+                                if (typeof val == 'string') {
+                                    setWestAmount(parseFloat(val))
+                                } else {
+                                    setWestAmount(val)
+                                }
+                            }}
                             placeholder='Enter how much WEST do you want to stakeT'
                             style={{width: "100%"}}
                         />
@@ -53,7 +59,13 @@ const StakeDrawer = ({opened, setOpened, ...props}: {
                             step={100}
                             defaultValue={eastAmount}
                             value={eastAmount}
-                            onChange={setEastAmount}
+                            onChange={(val: string | number, _) => {
+                                if (typeof val == 'string') {
+                                    setEastAmount(parseFloat(val))
+                                } else {
+                                    setEastAmount(val)
+                                }
+                            }}
                             placeholder='Enter how much EAST do you want to stake'
                             style={{width: "100%"}}
                         />
@@ -118,7 +130,13 @@ const UnstakeDrawer = ({opened, setOpened, ...props}: {
                             step={100}
                             defaultValue={westAmount}
                             value={westAmount}
-                            onChange={setWestAmount}
+                            onChange={(val: string | number, _) => {
+                                if (typeof val == 'string') {
+                                    setWestAmount(parseFloat(val))
+                                } else {
+                                    setWestAmount(val)
+                                }
+                            }}
                             placeholder='Enter how much WEST do you want to unstake'
                             style={{width: "100%"}}
                         />
@@ -130,7 +148,13 @@ const UnstakeDrawer = ({opened, setOpened, ...props}: {
                             step={100}
                             defaultValue={eastAmount}
                             value={eastAmount}
-                            onChange={setEastAmount}
+                            onChange={(val: string | number, _) => {
+                                if (typeof val == 'string') {
+                                    setEastAmount(parseFloat(val))
+                                } else {
+                                    setEastAmount(val)
+                                }
+                            }}
                             placeholder='Enter how much EAST do you want to unstake'
                             style={{width: "100%"}}
                         />
