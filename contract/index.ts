@@ -1,3 +1,3 @@
 import {start} from "@wavesenterprise/contract-core";
 
-start('./src/TestContract');
+start('./src/Syndex');
