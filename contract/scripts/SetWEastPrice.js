@@ -11,7 +11,7 @@ const NODE_URL = 'https://hackathon.welocal.dev/node-0';
 
 const sdk = new We(NODE_URL);
 
-const CONTRACT_ID = 'HUmCLhrvZdWqc35wWqybY86GouQBiseh56iG9RNCKJzP'
+const CONTRACT_ID = 'GK99AATRvvdNRQdoBJB6fkyS5vK6kGM2dievCzqtbbe7'
 
 async function create() {
     const config = await sdk.node.config()
@@ -33,7 +33,7 @@ async function create() {
         }, {
             key: 'west_price',
             type: 'string',
-            value: '100000'
+            value: '100000',
         }, {
             key: 'east_price',
             type: 'string',

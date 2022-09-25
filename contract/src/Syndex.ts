@@ -65,8 +65,8 @@ export default class SyndexContract {
         await this.onlyAdmin()
 
         let price: WEastPrice = {
-            WestPrice: westPrice,
-            EastPrice: eastPrice,
+            WestPrice: Number.parseInt(String(westPrice)),
+            EastPrice: Number.parseInt(String(eastPrice)),
         }
         const jsonPrice = JSON.stringify(price)
         this.state.setString("weast_price", jsonPrice)
@@ -135,8 +135,9 @@ export default class SyndexContract {
 
     @Action()
     async MintSUSD(
-        @Param('amount') amount: number
+        @Param('amount') amountParam: number
     ) {
+        let amount = Number.parseInt(String(amountParam))
         const valueOfCollateral = await this.valueOfCollateral(this.context.tx.senderPublicKey);
         if (valueOfCollateral / amount < 3) {
             throw new Error("Can't mint, CRatio will be under 300%. valueOfCollateral: "+valueOfCollateral+" amount: "+amount);
@@ -172,12 +173,12 @@ export default class SyndexContract {
             bank.TokenList.push({
                 Price: 1,
                 AssetID: assetId,
-                Supply: amount
+                Supply: amount.valueOf()
             });
             userPos.TokenList.push({
                 Price: 1,
                 AssetID: assetId,
-                Supply: amount
+                Supply: amount.valueOf()
             })
             this.state.setString("susd_address", assetId);
         } else {
@@ -188,12 +189,12 @@ export default class SyndexContract {
             new Asset(susdAddress).transfer(this.context.sender, amount);
             for (const i in bank.TokenList) {
                 if (bank.TokenList[i].AssetID == susdAddress) {
-                    bank.TokenList[i].Supply += amount;
+                    bank.TokenList[i].Supply += amount.valueOf();
                 }
             }
             for (const i in userPos.TokenList) {
                 if (userPos.TokenList[i].AssetID == susdAddress) {
-                    userPos.TokenList[i].Supply += amount;
+                    userPos.TokenList[i].Supply += amount.valueOf();
                 }
             }
         }
@@ -265,10 +266,8 @@ export default class SyndexContract {
             bank.WestBalance -= amountOfWest;
             bank.EastBalance -= amountOfEast;
 
-
-            //TODO
-            new Asset(null).transfer(this.context.tx.senderPublicKey, amountOfWest);
-            new Asset(bank.EastAssetId).transfer(this.context.tx.senderPublicKey, amountOfEast);
+            new Asset(null).transfer(this.context.tx.sender, amountOfWest);
+            new Asset(bank.EastAssetId).transfer(this.context.tx.sender, amountOfEast);
         } else {
             throw new Error("Can't withdraw this much, CRatio will be under 300%");
         }
@@ -283,9 +282,16 @@ export default class SyndexContract {
     @Action()
     async SwapSynth(
         @Param('token1_address') token1address: string,
-        @Param('amount_of_token1') amountOfToken1: number,
+        @Param('amount_of_token1') amountOfToken1Param: number,
         @Param('token2_address') token2address: string,
+        payment: Payments
     ) {
+        if (token1address != payment[0].assetId) {
+            throw new Error("passed incorrect token1address")
+        }
+
+        let amountOfToken1 = Number.parseInt(String(amountOfToken1Param))
+
         const bankString = await this.state.getString("bank");
         let bank:Bank = JSON.parse(bankString);
 
@@ -293,11 +299,12 @@ export default class SyndexContract {
         const userPos:UserPosition = JSON.parse(userPosString);
 
         let userIndex1, userIndex2;
-        for (const i in bank.TokenList) {
-            if (bank.TokenList[i].AssetID == token1address) {
+        userIndex2 = -1
+        for (const i in userPos.TokenList) {
+            if (userPos.TokenList[i].AssetID == token1address) {
                 userIndex1 = i;
             }
-            if (bank.TokenList[i].AssetID == token2address) {
+            if (userPos.TokenList[i].AssetID == token2address) {
                 userIndex2 = i;
             }
         }
@@ -310,22 +317,32 @@ export default class SyndexContract {
             if (bank.TokenList[i].AssetID == token2address) {
                 index2 = i;
             }
-        } //TODO
+        }
+
         for (const i in userPos.TokenList) {
             if (userPos.TokenList[i].AssetID == token1address) {
                 if (userPos.TokenList[i].Supply >= amountOfToken1) {
-                    let boughtAmount = amountOfToken1 * bank.TokenList[index1].Price / bank.TokenList[index1].Price;
+                    let boughtAmount = amountOfToken1 * bank.TokenList[index1].Price / bank.TokenList[index2].Price;
                     bank.TokenList[index1].Supply -= amountOfToken1;
                     bank.TokenList[index2].Supply += boughtAmount;
                     userPos.TokenList[userIndex1].Supply -= amountOfToken1;
-                    userPos.TokenList[userIndex2].Supply += boughtAmount;
 
                     new Asset(token1address).burn({amount: amountOfToken1})
                     new Asset(token2address).reissue({
                         quantity: boughtAmount,
                         isReissuable: true
                     })
-
+                    new Asset(token2address).transfer(this.context.tx.sender, boughtAmount)
+                    if (userIndex2 == -1) {
+                        userPos.TokenList.push({
+                            Price: 0,
+                            AssetID: token2address,
+                            Supply: boughtAmount
+                        })
+                        userPos.TokenList[userPos.TokenList.length-1].Supply += boughtAmount;
+                        break;
+                    }
+                    userPos.TokenList[userIndex2].Supply += boughtAmount;
                 } else {
                     throw new Error("Not enough tokens");
                 }
@@ -342,21 +359,46 @@ export default class SyndexContract {
     async CreateSynth(
         @Param('name') name: string,
         @Param('description') description: string,
+        @Param('price') priceParam: number
     ) {
         await this.onlyAdmin()
 
-        const assetod = await Asset.calculateAssetId(1);
-        new Asset(assetod).issue({
+        let price = Number.parseInt(String(priceParam))
+
+        const assetId = await Asset.calculateAssetId(1);
+        new Asset(assetId).issue({
             description: description,
             name: name,
             decimals: 8,
             isReissuable: true,
             quantity: 0,
-            assetId: assetod,
+            assetId: assetId,
             nonce: 1
         });
-        new Asset(assetod).transfer(this.context.sender, 0)
+
+        const bankString = await this.state.getString("bank");
+        let bank:Bank = JSON.parse(bankString);
+
+        bank.TokenList.push({
+            Price: price,
+            AssetID: assetId,
+            Supply: 0
+        });
+
+        const bankJson = JSON.stringify(bank);
+        this.state.setString("bank", bankJson);
+        //new Asset(assetId).transfer(this.context.sender, 0)
     }
+
+    @Action()
+    async DataChange(
+        @Param('key') key: string,
+        @Param('value') value: string,
+    ) {
+        await this.onlyAdmin();
+        this.state.setString(key, value);
+    }
+
 
     private async systemDebt() {
         let sysDebt = 0

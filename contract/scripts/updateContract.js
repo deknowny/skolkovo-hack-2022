@@ -18,10 +18,10 @@ async function create() {
     const keypair = await Keypair.fromExistingSeedPhrase(SEED);
 
     const tx = TRANSACTIONS.UpdateContract.V1({
-        contractId: "HUmCLhrvZdWqc35wWqybY86GouQBiseh56iG9RNCKJzP",
+        contractId: "GK99AATRvvdNRQdoBJB6fkyS5vK6kGM2dievCzqtbbe7",
         fee: fee,
-        imageHash: 'ec3ce1296998ffead956866fc95b53aa5fee34699f5c5480a878285732c3ee05',
-        image: 'registry.hub.docker.com/binaryarchaism/syndex_contact_test_v9:latest',
+        imageHash: '675752ca5d0171980ba9f896c790962e8e4f20db91b8ad263448ae71afdbcd54',
+        image: 'registry.hub.docker.com/binaryarchaism/syndex_contact_test_v10:1.0.12',
         validationPolicy: {type: "any"},
         senderPublicKey: await keypair.publicKey(),
         params: [],

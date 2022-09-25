@@ -17,8 +17,8 @@ async function create() {
 
     const tx = TRANSACTIONS.CreateContract.V5({
         fee: fee,
-        imageHash: '371491bfafeec87f85ea16d6473e2e80d53df74d2c42433a00b13a13e5eb2906',
-        image: 'registry.hub.docker.com/binaryarchaism/syndex_contact_test_v9:latest',
+        imageHash: 'cef019761967b2948568c84d449cb6312b428639dfc397ca317ba8e3123dfcc4',
+        image: 'registry.hub.docker.com/binaryarchaism/syndex_contact_test_v10:1.0.5',
         validationPolicy: {type: "any"},
         senderPublicKey: await keypair.publicKey(),
         params: [
@@ -29,7 +29,7 @@ async function create() {
             }
         ],
         payments: [],
-        contractName: 'SyndexContractTestV3',
+        contractName: 'SyndexContractTestV5',
         apiVersion: '1.0'
     })
 
