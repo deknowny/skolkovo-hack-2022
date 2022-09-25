@@ -11,7 +11,7 @@ const NODE_URL = 'https://hackathon.welocal.dev/node-0';
 
 const sdk = new We(NODE_URL);
 
-const CONTRACT_ID = 'HUmCLhrvZdWqc35wWqybY86GouQBiseh56iG9RNCKJzP'
+const CONTRACT_ID = 'GK99AATRvvdNRQdoBJB6fkyS5vK6kGM2dievCzqtbbe7'
 
 async function create() {
     const config = await sdk.node.config()
@@ -22,8 +22,11 @@ async function create() {
     const tx = TRANSACTIONS.CallContract.V5({
         fee: fee,
         contractId: CONTRACT_ID,
-        contractVersion: 1,
-        payments: [],
+        contractVersion: 8,
+        payments: [{
+            assetId: "Ge9sTGHwPrMkUd193YtHCisad81Px3VTBecBUQwBM5B7",
+            amount: 5
+        }],
         validationPolicy: {type: "any"},
         senderPublicKey: await keypair.publicKey(),
         params: [{
@@ -33,15 +36,15 @@ async function create() {
         }, {
             key: 'token1_address',
             type: 'string',
-            value: 'D4PxpXPQcEm3hTg2YMQHPL9BkDhojTPDBJ7sjh2eYBWy'
+            value: 'Ge9sTGHwPrMkUd193YtHCisad81Px3VTBecBUQwBM5B7'
         }, {
             key: 'amount_of_token1',
             type: 'string',
-            value: '1'
+            value: '5'
         }, {
             key: 'token2_address',
             type: 'string',
-            value: '36WnBs8Usf2UuZVbKDRVo8RMrB9s1dYZNeBSj4ATZLir'
+            value: '12TPsq9xvVw24KWuf61ZAcJdFTV4rxqNeZ65cdHTVwPH'
         }],
     })
 

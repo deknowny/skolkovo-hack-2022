@@ -22,26 +22,22 @@ async function create() {
     const tx = TRANSACTIONS.CallContract.V5({
         fee: fee,
         contractId: CONTRACT_ID,
-        contractVersion: 1,
+        contractVersion: 3,
         payments: [],
         validationPolicy: {type: "any"},
         senderPublicKey: await keypair.publicKey(),
         params: [{
             key: 'action',
             type: 'string',
-            value: 'CreateSynth'
+            value: 'DataChange'
         }, {
-            key: 'name',
+            key: 'key',
             type: 'string',
-            value: 'sBTC'
+            value: 'bank'
         }, {
-            key: 'description',
+            key: 'value',
             type: 'string',
-            value: 'Syndex sBTC'
-        }, {
-            key: 'price',
-            type: 'string',
-            value: '1000'
+            value: '{"Admin":"9qfGVAtoUCp972NtUyKKZ81gSuzNtkwU1zzXrDEqtwJM","WestBalance":270000,"EastBalance":900000,"EastAssetId":"B3FAiTZDY8nBvE7Ztux1outecpUGD5F3z6rzcA5nmd6r","DebtShare":0.9,"TokenList":[{"Price":1000,"AssetID":"Ge9sTGHwPrMkUd193YtHCisad81Px3VTBecBUQwBM5B7","Supply":10},{"Price":1,"AssetID":"12TPsq9xvVw24KWuf61ZAcJdFTV4rxqNeZ65cdHTVwPH","Supply":10000}]}'
         }],
     })
 

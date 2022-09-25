@@ -11,7 +11,7 @@ const NODE_URL = 'https://hackathon.welocal.dev/node-0';
 
 const sdk = new We(NODE_URL);
 
-const CONTRACT_ID = 'HUmCLhrvZdWqc35wWqybY86GouQBiseh56iG9RNCKJzP'
+const CONTRACT_ID = 'GK99AATRvvdNRQdoBJB6fkyS5vK6kGM2dievCzqtbbe7'
 
 async function create() {
     const config = await sdk.node.config()
@@ -22,7 +22,7 @@ async function create() {
     const tx = TRANSACTIONS.CallContract.V5({
         fee: fee,
         contractId: CONTRACT_ID,
-        contractVersion: 7,
+        contractVersion: 2,
         payments: [],
         validationPolicy: {type: "any"},
         senderPublicKey: await keypair.publicKey(),
@@ -33,11 +33,11 @@ async function create() {
         },{
             key: 'amount_of_west',
             type: 'string',
-            value: '300000'
+            value: '30000'
         },{
             key: 'amount_of_east',
             type: 'string',
-            value: '1000000'
+            value: '100000'
         },],
     })
 
