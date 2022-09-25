@@ -26,3 +26,20 @@ a {
 * {
   box-sizing: border-box;
 }
+
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+
+::-webkit-scrollbar-track {
+  background-color: #282c34;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:vertical {
+  background: linear-gradient(transparent, #429321);
+  border-radius: 5px;
+}

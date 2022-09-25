@@ -9,7 +9,7 @@ const nextConfig = {
     contractId: 'GK99AATRvvdNRQdoBJB6fkyS5vK6kGM2dievCzqtbbe7',
     sbtcAssetId: 'Ge9sTGHwPrMkUd193YtHCisad81Px3VTBecBUQwBM5B7',
     nodeURL: 'https://hackathon.welocal.dev/node-0',
-    contractVersion: 9,
+    contractVersion: 12,
   },
   target: "serverless",
   assetPrefix: process.env.NEXT_DEV == '1' ? null: null// "https://raw.githubusercontent.com/Syndex-SDX/syndex-sdx.github.io/main"
