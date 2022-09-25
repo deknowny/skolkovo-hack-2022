@@ -1,5 +1,4 @@
 import {Action, Asset, Context, ContractState, Ctx, Param, Payments, State} from "@wavesenterprise/contract-core";
-import {Long} from "@wavesenterprise/transactions-factory";
 
 export interface BankToken {
     AssetID: string;
