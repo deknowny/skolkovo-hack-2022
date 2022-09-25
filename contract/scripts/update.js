@@ -6,7 +6,7 @@ const SEED = 'cube craft word category chat wine fault high series more mule abs
 const NODE_URL = 'http://localhost/node-0';
 const sdk = new We(NODE_URL);
 
-const CONTRACT_ID = '4GY5aEqafwqq5WPxdr5Kgx2Mw2RjvoVt95eQuF4EbsTm'
+const CONTRACT_ID = 'BSwUo4CyganahycaHiMcq9zKueGFvgH3DA92GXUW1f6c'
 
 async function create() {
     const config = await sdk.node.config()
@@ -19,21 +19,22 @@ async function create() {
         contractId: CONTRACT_ID,
         contractVersion: 1,
         payments: [],
-        imageHash: '7cab813ab691e7a09c5aa3b0fcfb5e787fcd688a0e9a755ba8fd13dc83dc5ae1',
-        image: 'registry.hub.docker.com/binaryarchaism/test-contract_v2:latest',
         validationPolicy: {type: "any"},
         senderPublicKey: await keypair.publicKey(),
-        contractName: 'TestContractV2',
+        contractName: 'SyndexContractTestV2',
         apiVersion: '1.0',
         params: [{
             key: 'action',
             type: 'string',
-            value: 'addState'
-        },
-            {
-            key: 'info',
+            value: 'SetWEastPrice'
+        }, {
+            key: 'west_price',
             type: 'string',
-            value: 'kek-test'
+            value: '100'
+        }, {
+            key: 'east_price',
+            type: 'string',
+            value: '1'
         }],
     })
 
