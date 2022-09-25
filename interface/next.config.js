@@ -5,13 +5,14 @@ const nextConfig = {
     swcMinify: true,
   }, publicRuntimeConfig: {
     eastAssetId: 'B3FAiTZDY8nBvE7Ztux1outecpUGD5F3z6rzcA5nmd6r',
-    susdAssetId: 'D4PxpXPQcEm3hTg2YMQHPL9BkDhojTPDBJ7sjh2eYBWy',
-    contractId: 'HUmCLhrvZdWqc35wWqybY86GouQBiseh56iG9RNCKJzP',
+    susdAssetId: '12TPsq9xvVw24KWuf61ZAcJdFTV4rxqNeZ65cdHTVwPH',
+    contractId: 'GK99AATRvvdNRQdoBJB6fkyS5vK6kGM2dievCzqtbbe7',
+    sbtcAssetId: 'Ge9sTGHwPrMkUd193YtHCisad81Px3VTBecBUQwBM5B7',
     nodeURL: 'https://hackathon.welocal.dev/node-0',
     contractVersion: 9,
   },
   target: "serverless",
-  assetPrefix: 'https://syndex-sdx.github.io/'
+  assetPrefix: process.env.NEXT_DEV == '1' ? null: null// "https://raw.githubusercontent.com/Syndex-SDX/syndex-sdx.github.io/main"
 }
 
 module.exports = nextConfig

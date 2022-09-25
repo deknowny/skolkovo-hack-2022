@@ -1,6 +1,6 @@
 import getConfig from 'next/config'
 import {ContractPayment, TRANSACTIONS, TRANSACTION_TYPES} from "@wavesenterprise/transactions-factory";
-import { Panel, Button, Form, ButtonGroup, InputNumber, Drawer, Loader, Steps } from 'rsuite';
+import { Panel, Button, Form, ButtonGroup, InputNumber, Drawer, Loader, Steps, Progress } from 'rsuite';
 import PieChartIcon from '@rsuite/icons/PieChart';
 import React from 'react';
 
@@ -15,11 +15,15 @@ import TXStalker from '@/components/TXStalker';
 const config = getConfig();
 const eastAssetId = config.publicRuntimeConfig.eastAssetId;
 const nodeURL = config.publicRuntimeConfig.nodeURL;
+const contractId = config.publicRuntimeConfig.contractId;
 
 
-const StakeDrawer = ({opened, setOpened, ...props}: {
+const StakeDrawer = ({opened, setOpened, eastBalance, westBalance, allDoneCb, ...props}: {
     opened: boolean,
-    setOpened: (_: boolean) => void
+    setOpened: (_: boolean) => void,
+    eastBalance: number,
+    westBalance: number,
+    allDoneCb: () => void
 }) => {
 
     const [westAmount, setWestAmount] = React.useState<number>(.0);
@@ -51,7 +55,7 @@ const StakeDrawer = ({opened, setOpened, ...props}: {
                             placeholder='Enter how much WEST do you want to stakeT'
                             style={{width: "100%"}}
                         />
-                        <Form.HelpText>Available: TODO</Form.HelpText>
+                        <Form.HelpText>Available: {eastBalance}</Form.HelpText>
                     </Form.Group>
                     <Form.Group controlId="EAST amount">
                         <Form.ControlLabel>EAST amount</Form.ControlLabel>
@@ -69,7 +73,7 @@ const StakeDrawer = ({opened, setOpened, ...props}: {
                             placeholder='Enter how much EAST do you want to stake'
                             style={{width: "100%"}}
                         />
-                        <Form.HelpText>Available: TODO</Form.HelpText>
+                        <Form.HelpText>Available: {westBalance}</Form.HelpText>
                     </Form.Group>
                 </Form>
                 <TXStalker
@@ -98,6 +102,7 @@ const StakeDrawer = ({opened, setOpened, ...props}: {
                             return payments
                         }
                     }
+                    allDoneCb={allDoneCb}
                 />
             </Drawer.Body>
         </Drawer>
@@ -105,9 +110,12 @@ const StakeDrawer = ({opened, setOpened, ...props}: {
 }
 
 
-const UnstakeDrawer = ({opened, setOpened, ...props}: {
+const UnstakeDrawer = ({opened, setOpened, eastBalance, westBalance, allDoneCb, ...props}: {
     opened: boolean,
-    setOpened: (_: boolean) => void
+    setOpened: (_: boolean) => void,
+    eastBalance: number,
+    westBalance: number,
+    allDoneCb: () => void
 }) => {
 
 
@@ -140,7 +148,7 @@ const UnstakeDrawer = ({opened, setOpened, ...props}: {
                             placeholder='Enter how much WEST do you want to unstake'
                             style={{width: "100%"}}
                         />
-                        <Form.HelpText>Available: TODO</Form.HelpText>
+                        <Form.HelpText>Available: {eastBalance}</Form.HelpText>
                     </Form.Group>
                     <Form.Group controlId="EAST amount">
                         <Form.ControlLabel>WEST amount</Form.ControlLabel>
@@ -158,10 +166,9 @@ const UnstakeDrawer = ({opened, setOpened, ...props}: {
                             placeholder='Enter how much EAST do you want to unstake'
                             style={{width: "100%"}}
                         />
-                        <Form.HelpText>Available: TODO</Form.HelpText>
+                        <Form.HelpText>Available: {westBalance}</Form.HelpText>
                     </Form.Group>
                 </Form>
-
                 <TXStalker
                     prepareParamsCb={
                         () => [{
@@ -189,6 +196,7 @@ const UnstakeDrawer = ({opened, setOpened, ...props}: {
                             return payments
                         }
                     }
+                    allDoneCb={allDoneCb}
                 />
             </Drawer.Body>
         </Drawer>
@@ -201,19 +209,80 @@ const StakingSuggestion = () => {
     const [stakeDrawerOpened, setStakeDrawerOpened] = React.useState(false);
     const [unstakeDrawerOpened, setUnstakeDrawerOpened] = React.useState(false);
 
+    const [westStaked, setWestStaked] = React.useState<number>(0);
+    const [eastStaked, setEastStaked] = React.useState<number>(0);
+
+    const [westBalance, setWestBalance] = React.useState<number>(1);
+    const [eastBalance, setEastBalance] = React.useState<number>(1);
+
+    const updateBalance = () => {
+        const optionalPublicState = localStorage.getItem('publicState')
+        if (optionalPublicState != null) {
+            const publicState = JSON.parse(optionalPublicState)
+            fetch(
+                `${nodeURL}/contracts/${contractId}/userpos_${publicState['account']['publicKey']}`, {
+                    method: "GET"
+                }
+            ).then(res => res.json().then(res => {
+                const balance = JSON.parse(res['value'])
+                console.log(balance)
+                setWestStaked(
+                    (balance['WestBalance'] / Math.pow(10, 8) * 100) / 100
+                )
+                setEastStaked(
+                    (balance['EastBalance'] / Math.pow(10, 8) * 100) / 100
+                )
+            }))
+
+            Promise.all([
+                fetch(`${nodeURL}/addresses/balance/${publicState['account']['address']}`, {
+                    method: 'GET'
+                }),
+                fetch(`${nodeURL}/assets/balance/${publicState['account']['address']}/${eastAssetId}`, {
+                    method: 'GET'
+                })
+            ]).then((responses) => {
+                Promise.all([
+                    responses[0].json(), responses[1].json()
+                ]).then((contents) => {
+                    setEastBalance(Math.round(contents[0]['balance'] / Math.pow(10, 8) * 100) / 100)
+                    setWestBalance(Math.round(contents[1]['balance'] / Math.pow(10, 8) * 100) / 100)
+                })
+            })
+        }
+    }
+
+    React.useEffect(updateBalance)
+
     return (
         <Panel header={
             <h3><PieChartIcon /> Staking</h3>
         } bordered shaded>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut metus varius, malesuada elit sed, venenatis metus.
             <hr />
+            <div style={{
+                display: "flex",
+                justifyContent: "space-around"
+            }}>
+                Total WEST Staked: {westStaked}
+                <Progress.Line percent={Math.round(westStaked / westBalance * 100 * 1000) / 1000} strokeColor="#ffc107" />
+            </div>
+            <br />
+            <div style={{
+                display: "flex",
+                justifyContent: "space-around"
+            }}>
+                Total EAST Staked: {eastStaked}
+                <Progress.Line  percent={Math.round(eastStaked / eastBalance * 100 * 1000) / 1000} strokeColor="#ffc107" />
+            </div>
 
+            <hr />
             <ButtonGroup justified>
                 <Button color="green" appearance="ghost" onClick={() => setStakeDrawerOpened(true)}><b>Stake</b></Button>
                 <Button color="yellow" appearance="ghost" onClick={() => setUnstakeDrawerOpened(true)}><b>Unstake</b></Button>
             </ButtonGroup>
-            <StakeDrawer opened={stakeDrawerOpened} setOpened={setStakeDrawerOpened} />
-            <UnstakeDrawer opened={unstakeDrawerOpened} setOpened={setUnstakeDrawerOpened} />
+            <StakeDrawer allDoneCb={updateBalance} opened={stakeDrawerOpened} setOpened={setStakeDrawerOpened} eastBalance={eastBalance} westBalance={westBalance} />
+            <UnstakeDrawer allDoneCb={updateBalance} opened={unstakeDrawerOpened} setOpened={setUnstakeDrawerOpened} eastBalance={eastBalance} westBalance={westBalance} />
         </Panel>
     );
 }
