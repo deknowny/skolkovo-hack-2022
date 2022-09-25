@@ -8,9 +8,10 @@ const config = getConfig();
 const eastAssetId = config.publicRuntimeConfig.eastAssetId;
 const nodeURL = config.publicRuntimeConfig.nodeURL;
 
-const TXStalker = ({prepareParamsCb, preparePaymentsCb, ...props}: {
+const TXStalker = ({prepareParamsCb, preparePaymentsCb, allDoneCb, ...props}: {
     prepareParamsCb: () => Array<ContractParam>,
-    preparePaymentsCb: () => Array<ContractPayment>
+    preparePaymentsCb: () => Array<ContractPayment>,
+    allDoneCb: () => void
 }) => {
     const [txPanelOpened, setTxPanelOpened] = React.useState<string>("none");
     const [txStep, setTxStep] = React.useState<number>(0);
@@ -51,6 +52,7 @@ const TXStalker = ({prepareParamsCb, preparePaymentsCb, ...props}: {
                                                     null
                                                 } else if (res[0]['status'] == 'Success') {
                                                     setTxStepStatus("finish")
+                                                    allDoneCb()
                                                     clearInterval(refreshId)
                                                 } else {
                                                     setCallFailMsg(res[0]["message"])
