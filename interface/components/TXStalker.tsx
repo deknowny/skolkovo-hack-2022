@@ -15,7 +15,8 @@ const TXStalker = ({prepareParamsCb, preparePaymentsCb, ...props}: {
     const [txPanelOpened, setTxPanelOpened] = React.useState<string>("none");
     const [txStep, setTxStep] = React.useState<number>(0);
     const [txStepStatus, setTxStepStatus] = React.useState<"process" | "finish" | "wait" | "error">("process");
-    const [txId, setTxId] = React.useState("")
+    const [txId, setTxId] = React.useState<string>("")
+    const [callFailMsg, setCallFailMsg] = React.useState<string>("")
 
     return (
         <div>
@@ -46,6 +47,7 @@ const TXStalker = ({prepareParamsCb, preparePaymentsCb, ...props}: {
                                                     setTxStepStatus("finish")
                                                     clearInterval(refreshId)
                                                 } else {
+                                                    setCallFailMsg(res[0]["message"])
                                                     setTxStepStatus("error")
                                                     clearInterval(refreshId)
                                                 }
@@ -79,9 +81,9 @@ const TXStalker = ({prepareParamsCb, preparePaymentsCb, ...props}: {
             <br />
             <Panel style={{display: txPanelOpened}} header={<Loader style={{display: txStepStatus == "process" ? "block" : "none"}} size="md" speed="fast" content={<h3>&nbsp;Processing the TX</h3>} />} shaded bordered>
                 <Steps current={txStep} vertical currentStatus={txStepStatus}>
-                    <Steps.Item title={<span>Sign Transation: {txId }</span>} />
+                    <Steps.Item title={<span>Sign Transation { txId }</span>} />
                     <Steps.Item title="Broadcast Transaction" />
-                    <Steps.Item title="Executing call" />
+                    <Steps.Item title={<span>Executing call{ callFailMsg ? `: Reverted with '${callFailMsg}'` : '' }</span>} />
                 </Steps>
             </Panel>
         </div>

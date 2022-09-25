@@ -5,8 +5,9 @@ const nextConfig = {
     swcMinify: true,
   }, publicRuntimeConfig: {
     eastAssetId: 'B3FAiTZDY8nBvE7Ztux1outecpUGD5F3z6rzcA5nmd6r',
-    contractId: '4WvWaQCQX813wesau4BwdMDstMLapJFA61GUXCXn6uyp',
-    nodeURL: 'https://hackathon.welocal.dev/node-0'
+    contractId: 'HUmCLhrvZdWqc35wWqybY86GouQBiseh56iG9RNCKJzP',
+    nodeURL: 'https://hackathon.welocal.dev/node-0',
+    contractVersion: 7
   }
 
 
