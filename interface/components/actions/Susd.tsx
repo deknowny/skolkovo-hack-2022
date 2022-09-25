@@ -164,7 +164,8 @@ const ProcessSusdSuggestion = () => {
         <Panel header={
             <h3><DragableIcon /> Process sUSD</h3>
         } bordered shaded>
-            Etiam non urna eget felis placerat pulvinar. Aliquam molestie nisl odio, vel interdum dui interdum scelerisque. Nulla ullamcorper massa quis elit facilisis, at sollicitudin nisl fermentum.
+            To mint any synthetic asset, you need to mint sUSD first. To mint 1 sUSD, you need 3$ worth of collateral. Your new debt will lock your staked EAST and WEST. To redeem EAST and WEST, get rid of debt by burning sUSD.
+
             <hr />
             <div style={{
                 // display: "flex",

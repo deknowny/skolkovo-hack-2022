@@ -55,7 +55,7 @@ const StakeDrawer = ({opened, setOpened, eastBalance, westBalance, allDoneCb, ..
                             placeholder='Enter how much WEST do you want to stakeT'
                             style={{width: "100%"}}
                         />
-                        <Form.HelpText>Available: {eastBalance}</Form.HelpText>
+                        <Form.HelpText>Available: {westBalance}</Form.HelpText>
                     </Form.Group>
                     <Form.Group controlId="EAST amount">
                         <Form.ControlLabel>EAST amount</Form.ControlLabel>
@@ -73,7 +73,7 @@ const StakeDrawer = ({opened, setOpened, eastBalance, westBalance, allDoneCb, ..
                             placeholder='Enter how much EAST do you want to stake'
                             style={{width: "100%"}}
                         />
-                        <Form.HelpText>Available: {westBalance}</Form.HelpText>
+                        <Form.HelpText>Available: {eastBalance}</Form.HelpText>
                     </Form.Group>
                 </Form>
                 <TXStalker
@@ -148,10 +148,10 @@ const UnstakeDrawer = ({opened, setOpened, eastBalance, westBalance, allDoneCb, 
                             placeholder='Enter how much WEST do you want to unstake'
                             style={{width: "100%"}}
                         />
-                        <Form.HelpText>Available: {eastBalance}</Form.HelpText>
+                        <Form.HelpText>Available: {westBalance}</Form.HelpText>
                     </Form.Group>
                     <Form.Group controlId="EAST amount">
-                        <Form.ControlLabel>WEST amount</Form.ControlLabel>
+                        <Form.ControlLabel>EAST amount</Form.ControlLabel>
                         <InputNumber
                             step={100}
                             defaultValue={eastAmount}
@@ -166,7 +166,7 @@ const UnstakeDrawer = ({opened, setOpened, eastBalance, westBalance, allDoneCb, 
                             placeholder='Enter how much EAST do you want to unstake'
                             style={{width: "100%"}}
                         />
-                        <Form.HelpText>Available: {westBalance}</Form.HelpText>
+                        <Form.HelpText>Available: {eastBalance}</Form.HelpText>
                     </Form.Group>
                 </Form>
                 <TXStalker
@@ -174,7 +174,7 @@ const UnstakeDrawer = ({opened, setOpened, eastBalance, westBalance, allDoneCb, 
                         () => [{
                             key: 'action',
                             type: 'string',
-                            value: 'DepositCollateral'
+                            value: 'WithdrawCollateral'
                         }]
                     }
                     preparePaymentsCb={
@@ -245,8 +245,8 @@ const StakingSuggestion = () => {
                 Promise.all([
                     responses[0].json(), responses[1].json()
                 ]).then((contents) => {
-                    setEastBalance(Math.round(contents[0]['balance'] / Math.pow(10, 8) * 100) / 100)
-                    setWestBalance(Math.round(contents[1]['balance'] / Math.pow(10, 8) * 100) / 100)
+                    setWestBalance(Math.round((contents[0]['balance'] / Math.pow(10, 8)) * 100) / 100)
+                    setEastBalance(Math.round((contents[1]['balance'] / Math.pow(10, 8)) * 100) / 100)
                 })
             })
         }
@@ -258,14 +258,15 @@ const StakingSuggestion = () => {
         <Panel header={
             <h3><PieChartIcon /> Staking</h3>
         } bordered shaded>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut metus varius, malesuada elit sed, venenatis metus.
+            Deposit WEST or EAST tokens as collateral. Price of WEST is counted as 0.75 of its real price, because of its volatility. It&apos;s better and safer to deposit EAST, because it is stable.
+
             <hr />
             <div style={{
                 display: "flex",
                 justifyContent: "space-around"
             }}>
                 Total WEST Staked: {westStaked}
-                <Progress.Line percent={Math.round(westStaked / westBalance * 100 * 1000) / 1000} strokeColor="#ffc107" />
+                <Progress.Line percent={Math.round(westStaked / (westBalance + westStaked)* 100 * 100) / 100} strokeColor="#ffc107" />
             </div>
             <br />
             <div style={{
@@ -273,7 +274,7 @@ const StakingSuggestion = () => {
                 justifyContent: "space-around"
             }}>
                 Total EAST Staked: {eastStaked}
-                <Progress.Line  percent={Math.round(eastStaked / eastBalance * 100 * 1000) / 1000} strokeColor="#ffc107" />
+                <Progress.Line  percent={Math.round(eastStaked / (eastBalance + eastStaked) * 100 * 100) / 100} strokeColor="#ffc107" />
             </div>
 
             <hr />
@@ -282,7 +283,7 @@ const StakingSuggestion = () => {
                 <Button color="yellow" appearance="ghost" onClick={() => setUnstakeDrawerOpened(true)}><b>Unstake</b></Button>
             </ButtonGroup>
             <StakeDrawer allDoneCb={updateBalance} opened={stakeDrawerOpened} setOpened={setStakeDrawerOpened} eastBalance={eastBalance} westBalance={westBalance} />
-            <UnstakeDrawer allDoneCb={updateBalance} opened={unstakeDrawerOpened} setOpened={setUnstakeDrawerOpened} eastBalance={eastBalance} westBalance={westBalance} />
+            <UnstakeDrawer allDoneCb={updateBalance} opened={unstakeDrawerOpened} setOpened={setUnstakeDrawerOpened} eastBalance={eastStaked} westBalance={westStaked} />
         </Panel>
     );
 }

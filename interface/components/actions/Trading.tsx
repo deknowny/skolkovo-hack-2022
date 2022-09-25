@@ -33,7 +33,7 @@ const TradingDrawer = ({opened, setOpened, ...props}: {
     const [token1AssetId, setToken1AssetId] = React.useState(null);
     const [token2AssetId, setToken2AssetId] = React.useState(null);
 
-    const [token1AssetBalance, setToken1AssetBalance] = React.useState(null);
+    const [token1AssetBalance, setToken1AssetBalance] = React.useState<number>(0);
 
     const updateBalance = () => {
         const optionalPublicState = localStorage.getItem('publicState')
@@ -44,8 +44,8 @@ const TradingDrawer = ({opened, setOpened, ...props}: {
                 method: 'GET'
             }).then((response) => {
                 response.json().then(content => {
-                    const balance = Math.round(content['balance'] / Math.pow(10, 8) * 100) / 100
-                    setToken1AssetBalance(content['balance'])
+                    const balance: number = Math.round(content['balance'] / Math.pow(10, 8) * 100) / 100
+                    setToken1AssetBalance(balance)
                 })
             })
         }
@@ -101,9 +101,13 @@ const TradingDrawer = ({opened, setOpened, ...props}: {
                 </Form>
 
                 <TXStalker
+                // @ts-ignore
                     prepareParamsCb={
                         () => {
                             if (token2AssetId == null) {
+                                throw new Error("Select a token")
+                            }
+                            if (token1AssetId == null) {
                                 throw new Error("Select a token")
                             }
                             return [
@@ -116,6 +120,16 @@ const TradingDrawer = ({opened, setOpened, ...props}: {
                                     key: 'token2_address',
                                     type: 'string',
                                     value: token2AssetId
+                                },
+                                {
+                                    key: 'token1_addresss',
+                                    type: 'string',
+                                    value: token1AssetId
+                                },
+                                {
+                                    key: 'amount_of_token1',
+                                    type: 'integer',
+                                    value: token1Amount * Math.pow(10, 8)
                                 }
                             ]
                         }
@@ -147,7 +161,7 @@ const TradingSuggestion = () => {
         <Panel header={
             <h3><TrendIcon /> Trading</h3>
         } bordered shaded>
-            Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Pellentesque sed posuere mauris, ut eleifend elit. Fusce id nibh nisi. Etiam sit amet vehicula sem. Aenean a facilisis ex, et sagittis enim.
+            Swap your sUSD to any other synthetic asset (sBTC, iBTC) or the other way round. This uses oracles and will incur no slippage.
             <hr />
             <ButtonGroup justified>
                 <Button color="green" appearance="ghost" onClick={() => setTradingViewOpened(true)}><b>Trade your assets</b></Button>
